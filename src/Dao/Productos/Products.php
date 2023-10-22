@@ -5,6 +5,50 @@ namespace Dao\Productos;
 
 class Products
 {
+    public static function getAllProducts()
+    {
+        return array(
+            array(
+                "productId" => 101,
+                "productName" => "Ipad Pro",
+                "productDescription" => "Descripción del producto 1",
+                "img_url" => "https://placehold.co/300x220?text=Panadol",
+                "price" => 100,
+                "bar_code" => "00001"
+            ),
+            array(
+                "productId" => 102,
+                "productName" => "Iphone 11 Pro max",
+                "productDescription" => "Descripción del producto 2",
+                "img_url" => "https://placehold.co/300x220?text=Panadol",
+                "price" => 100,
+                "bar_code" => "00001"
+            ),
+            array(
+                "productId" => 103,
+                "productName" => "Laptop Dell i7",
+                "productDescription" => "Descripción del producto 3",
+                "img_url" => "https://placehold.co/300x220?text=Panadol",
+                "price" => 100,
+                "bar_code" => "00001"
+            ),
+        );
+    }
+
+    public static function getProductByid($id)
+    {
+        $product = array();
+        $products = self::getAllProducts();
+
+        foreach ($products as $proid) {
+            if ($proid["productId"] === $id) {
+                $product = $proid;
+                break;
+            }
+        }
+        return $product;
+    }
+
     public static function getFeaturedProducts()
     {
         return array(
@@ -65,7 +109,7 @@ class Products
                 "productName" => "Producto 73",
                 "productDescription" => "Descripción del producto 73",
                 "img_url" => "https://via.placeholder.com/150",
-                "productPrice" => 10.00,
+                "price" => 10.00,
                 "bar_code" => "11002"
             ],
             [
@@ -73,7 +117,7 @@ class Products
                 "productName" => "Producto 15",
                 "productDescription" => "Descripción del producto 15",
                 "img_url" => "https://via.placeholder.com/150",
-                "productPrice" => 13.00,
+                "price" => 13.00,
                 "bar_code" => "11002"
             ],
             [
@@ -81,7 +125,7 @@ class Products
                 "productName" => "Producto 10",
                 "productDescription" => "Descripción del producto 10",
                 "img_url" => "https://via.placeholder.com/150",
-                "productPrice" => 20.00,
+                "price" => 20.00,
                 "bar_code" => "11002"
             ]
         ];
