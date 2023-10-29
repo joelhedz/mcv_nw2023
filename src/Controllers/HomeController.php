@@ -14,7 +14,7 @@ class HomeController extends PublicController
         $viewData["productsOnSale"] = ProductsDao::getDailyDeals();
         $viewData["productsHighlighted"] = ProductsDao::getFeaturedProducts();
         $viewData["productsNew"] = ProductsDao::getNewProducts();
-        Site::addLink("public/css/productStyle.css");
+        Site::addLink("public/css/products.css");
         Renderer::render("home", $viewData);
     }
 }

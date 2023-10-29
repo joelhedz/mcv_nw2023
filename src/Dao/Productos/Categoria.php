@@ -25,7 +25,7 @@ class Categoria extends Table
             "name" => $name,
             "status" => $status
         ];
-        $sqlQuery = "INSERT INTO categorias (name,status,create_time) values(:name,:status,NOM());";
+        $sqlQuery = "INSERT INTO categorias (name,status,create_time) values(:name,:status,NOW());";
         return self::executeNonQuery($sqlQuery, $params);
     }
 
@@ -42,7 +42,7 @@ class Categoria extends Table
 
     public static function deleteCategorias($id)
     {
-        $sqlQuery = "DELETE * FROM categorias where id = :id;";
+        $sqlQuery = "DELETE  FROM categorias where id = :id;";
         $params = ["id" => $id];
         return self::executeNonQuery($sqlQuery, $params);
     }

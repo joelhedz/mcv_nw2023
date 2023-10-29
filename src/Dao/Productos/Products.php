@@ -2,132 +2,132 @@
 
 namespace Dao\Productos;
 
+use Dao\Table;
 
-class Products
+class Products extends Table
 {
-    public static function getAllProducts()
-    {
-        return array(
-            array(
-                "productId" => 101,
-                "productName" => "Ipad Pro",
-                "productDescription" => "Descripción del producto 1",
-                "img_url" => "https://placehold.co/300x220?text=Panadol",
-                "price" => 100,
-                "bar_code" => "00001"
-            ),
-            array(
-                "productId" => 102,
-                "productName" => "Iphone 11 Pro max",
-                "productDescription" => "Descripción del producto 2",
-                "img_url" => "https://placehold.co/300x220?text=Panadol",
-                "price" => 100,
-                "bar_code" => "00001"
-            ),
-            array(
-                "productId" => 103,
-                "productName" => "Laptop Dell i7",
-                "productDescription" => "Descripción del producto 3",
-                "img_url" => "https://placehold.co/300x220?text=Panadol",
-                "price" => 100,
-                "bar_code" => "00001"
-            ),
-        );
-    }
-
-    public static function getProductByid($id)
-    {
-        $product = array();
-        $products = self::getAllProducts();
-
-        foreach ($products as $proid) {
-            if ($proid["productId"] === $id) {
-                $product = $proid;
-                break;
-            }
-        }
-        return $product;
-    }
-
     public static function getFeaturedProducts()
     {
-        return array(
-            array(
-                "productId" => 1,
-                "productName" => "Panadol",
-                "productDescription" => "Descripción del producto 1",
-                "img_url" => "https://placehold.co/300x220?text=Panadol",
-                "price" => 100,
-                "bar_code" => "00001"
-            ),
-            array(
-                "productId" => 2,
-                "productName" => "Panadol Ultra",
-                "productDescription" => "Descripción del producto 2",
-                "img_url" => "https://placehold.co/300x220?text=Panadol",
-                "price" => 100,
-                "bar_code" => "00001"
-            ),
-            array(
-                "productId" => 3,
-                "productName" => "Panadol Gripe y Tos",
-                "productDescription" => "Descripción del producto 3",
-                "img_url" => "https://placehold.co/300x220?text=Panadol",
-                "price" => 100,
-                "bar_code" => "00001"
-            ),
-        );
+        $sqlSel = "SELECT p.productId, p.productName, p.productDescription, p.productPrice, p.productImgUrl, p.productStatus FROM products p INNER JOIN highlights h ON p.productId = h.productId WHERE h.highlightStart <= NOW() AND h.highlightEnd >= NOW()";
+        $params = [];
+        $registros = self::obtenerRegistros($sqlSel, $params);
+        return $registros;
     }
 
     public static function getNewProducts()
     {
-        return array(
-            [
-                "productId" => 99,
-                "productName" => "Producto 99",
-                "productDescription" => "Descripción del producto nuevo 99",
-                "img_url" => "https://via.placeholder.com/150",
-                "price" => 50.00,
-                "bar_code" => "10001"
-            ],
-            [
-                "productId" => 100,
-                "productName" => "Producto 100",
-                "productDescription" => "Descripción del producto nuevo 100",
-                "img_url" => "https://via.placeholder.com/150",
-                "price" => 130.00,
-                "bar_code" => "10002"
-            ]
-        );
+        $sqlSel = "SELECT p.productId, p.productName, p.productDescription, p.productPrice, p.productImgUrl, p.productStatus FROM products p WHERE p.productStatus = 'ACT' ORDER BY p.productId DESC LIMIT 3";
+        $params = [];
+        $registros = self::obtenerRegistros($sqlSel, $params);
+        return $registros;
     }
 
     public static function getDailyDeals()
     {
-        return [
-            [
-                "productId" => 73,
-                "productName" => "Producto 73",
-                "productDescription" => "Descripción del producto 73",
-                "img_url" => "https://via.placeholder.com/150",
-                "price" => 10.00,
-                "bar_code" => "11002"
-            ],
-            [
-                "productId" => 15,
-                "productName" => "Producto 15",
-                "productDescription" => "Descripción del producto 15",
-                "img_url" => "https://via.placeholder.com/150",
-                "price" => 13.00,
-                "bar_code" => "11002"
-            ],
-            [
-                "productId" => 10,
-                "productName" => "Producto 10",
-                "productDescription" => "Descripción del producto 10",
-                "img_url" => "https://via.placeholder.com/150",
-                "price" => 20.00,
-                "bar_code" => "11002"
-            ]
+        $sqlSel = "SELECT p.productId, p.productName, p.productDescription, s.salePrice as productPrice, p.productImgUrl, p.productStatus FROM products p INNER JOIN sales s ON p.productId = s.productId WHERE s.saleStart <= NOW() AND s.saleEnd >= NOW()";
+        $params = [];
+        $registros = self::obtenerRegistros($sqlSel, $params);
+        return $registros;
+    }
+
+    /*CRUD PRODUCTS*/
+    public static function getProducts(
+        string $partialName = "",
+        string $status = "",
+        string $orderBy = "",
+        bool $orderDescending = false,
+        int $page = 0,
+        int $itemsPerPage = 10
+    ) {
+        $sqlstr = "SELECT p.productId, p.productName, p.productDescription, p.productPrice, p.productImgUrl, p.productStatus, case when p.productStatus = 'ACT' then 'Activo' when p.productStatus = 'INA' then 'Inactivo' else 'Sin Asignar' end as productStatusDsc 
+        FROM products p";
+        $sqlstrCount = "SELECT COUNT(*) as count FROM products p";
+        $conditions = [];
+        $params = [];
+        if ($partialName != "") {
+            $conditions[] = "p.productName LIKE :partialName";
+            $params["partialName"] = "%" . $partialName . "%";
+        }
+        if (!in_array($status, ["ACT", "INA", ""])) {
+            throw new \Exception("Error Processing Request Status has invalid value");
+        }
+        if ($status != "") {
+            $conditions[] = "p.productStatus = :status";
+            $params["status"] = $status;
+        }
+        if (count($conditions) > 0) {
+            $sqlstr .= " WHERE " . implode(" AND ", $conditions);
+            $sqlstrCount .= " WHERE " . implode(" AND ", $conditions);
+        }
+        if (!in_array($orderBy, ["productId", "productName", "productPrice", ""])) {
+            throw new \Exception("Error Processing Request OrderBy has invalid value");
+        }
+        if ($orderBy != "") {
+            $sqlstr .= " ORDER BY " . $orderBy;
+            if ($orderDescending) {
+                $sqlstr .= " DESC";
+            }
+        }
+        $numeroDeRegistros = self::obtenerUnRegistro($sqlstrCount, $params)["count"];
+        $pagesCount = ceil($numeroDeRegistros / $itemsPerPage);
+        if ($page > $pagesCount - 1) {
+            $page = $pagesCount - 1;
+        }
+        $sqlstr .= " LIMIT " . $page * $itemsPerPage . ", " . $itemsPerPage;
+
+        $registros = self::obtenerRegistros($sqlstr, $params);
+        return ["products" => $registros, "total" => $numeroDeRegistros, "page" => $page, "itemsPerPage" => $itemsPerPage];
+    }
+
+    public static function getProductById(int $productId)
+    {
+        $sqlstr = "SELECT p.productId, p.productName, p.productDescription, p.productPrice, p.productImgUrl, p.productStatus FROM products p WHERE p.productId = :productId";
+        $params = ["productId" => $productId];
+        return self::obtenerUnRegistro($sqlstr, $params);
+    }
+
+    public static function insertProduct(
+        string $productName,
+        string $productDescription,
+        float $productPrice,
+        string $productImgUrl,
+        string $productStatus
+    ) {
+        $sqlstr = "INSERT INTO products (productName, productDescription, productPrice, productImgUrl, productStatus) VALUES (:productName, :productDescription, :productPrice, :productImgUrl, :productStatus)";
+        $params = [
+            "productName" => $productName,
+            "productDescription" => $productDescription,
+            "productPrice" => $productPrice,
+            "productImgUrl" => $productImgUrl,
+            "productStatus" => $productStatus
         ];
+        return self::executeNonQuery($sqlstr, $params);
+    }
+
+    public static function updateProduct(
+        int $productId,
+        string $productName,
+        string $productDescription,
+        float $productPrice,
+        string $productImgUrl,
+        string $productStatus
+    ) {
+        $sqlstr = "UPDATE products SET productName = :productName, productDescription = :productDescription, productPrice = :productPrice, productImgUrl = :productImgUrl, productStatus = :productStatus WHERE productId = :productId";
+        $params = [
+            "productId" => $productId,
+            "productName" => $productName,
+            "productDescription" => $productDescription,
+            "productPrice" => $productPrice,
+            "productImgUrl" => $productImgUrl,
+            "productStatus" => $productStatus
+        ];
+        return self::executeNonQuery($sqlstr, $params);
+    }
+
+    public static function deleteProduct(int $productId)
+    {
+        $sqlstr = "DELETE FROM products WHERE productId = :productId";
+        $params = ["productId" => $productId];
+        return self::executeNonQuery($sqlstr, $params);
     }
 }

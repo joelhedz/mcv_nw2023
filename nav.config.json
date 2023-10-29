@@ -14,7 +14,17 @@
       "id": "Menu_NewProds",
       "nav_url": "index.php?page=Productos_NewProds",
       "nav_label":"<i class=\"fas fa-sign-in-alt\"></i>&nbsp;Nuevos Productos"
-    }
+    },
+    {
+      "id": "Menu_ListCategorias",
+      "nav_url": "index.php?page=Productos_Categorias_CategoriasList",
+      "nav_label":"<i class=\"fas fa-sign-in-alt\"></i>&nbsp;Lista Categorias"
+    },
+    {
+      "id": "Menu_Products",
+    "nav_url": "index.php?page=Productos_Products",
+    "nav_label":"<i class=\"fas fa-table\"></i>&nbsp;WW Productos"
+  }
   ],
   "private": [
     {
