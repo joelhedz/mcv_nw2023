@@ -3,12 +3,12 @@
 </section> 
 {{with categorias}}
 <form class="my-4 depth-2 py-4 px-4 row" action="index.php?page=Productos_Categorias_CategoriasForm&mode={{~mode}}&id={{id}}" method="POST">
+    <input type="hidden" name="xss_token" value="{{~xss_token}}">
     <section class="col-8 offset-2">
         <section class="row align-center">
             <label class="col-4" for="id">Código</label>
             <input class="col-6" type="text" name="id" id="id" value="{{id}}" readonly/>
         </section>
-   
     <br>
         <section class="row align-center">
             <label class="col-4" for="name">Categoria</label>
@@ -17,13 +17,12 @@
         </section>
     
     <br>
-        <section class="row align-center">   
+        <section class="row my-2 align-center">
             <label class="col-4" for="status">Estado</label>
-            <select class="col-6" id="status" name="status" {{if ~readonly}}disabled readonly {{endif ~readonly}}>
-                <option value="AC"{{AC_selected}}>Activo</option>
-                <option value="INA"{{INA_selected}}>Inactivo</option>
+            <select class="col-6" id="status" name="status">
+                <option value="AC" {{AC_selected}}>Activo</option>
+                <option value="INA" {{INA_selected}}>Inactivo</option>
             </select>
-
             {{if status_error}}<div class="error">{{status_error}}</div>{{endif status_error}}
         </section>
         <br><br>

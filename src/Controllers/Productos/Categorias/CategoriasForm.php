@@ -15,6 +15,7 @@ class CategoriasForm extends PublicController
     private $mode = 'INS';
     private $viewData = [];
     private $error = [];
+    private $xss_token = '';
     private $modes = [
         "INS" => "Creando nueva Categoria",
         "UPD" => "Editando %s (%s)",
@@ -65,13 +66,27 @@ class CategoriasForm extends PublicController
 
     private function validateFormData()
     {
+        //Validar cross site scripting
+        if (isset($_POST["xss_token"])) {
+            $this->xss_token = $_POST["xss_token"];
+            if ($_SESSION["xss_token_categoria_form"] !== $this->xss_token) {
+                error_log("CategoriaForm: Validación de xss Fallo");
+                $this->handleError("Error al procesar la petición");
+                return false;
+            }
+        } else {
+            error_log("CategoriaForm: Validación de xss Fallo");
+            $this->handleError("Error al procesar la petición");
+            return false;
+        }
+
         //Si el nombre no esta vació
         if (Validators::IsEmpty($_POST["name"])) {
             $this->error["name_error"] = "Campo es requerido!";
         }
         //Sean las opciones correctas
         if (!in_array($_POST["status"], ["INA", "AC"])) {
-            $this->error["status_error"] = "Estados de la categoría es invalido";
+            $this->error["status_error"] = "Estado de la categoría es inválido.";
         }
         return count($this->error) == 0;
     }
@@ -129,6 +144,11 @@ class CategoriasForm extends PublicController
 
         $this->viewData["readonly"] = in_array($this->mode, ["DSP", "DEL"]) ? 'readonly' : '';
         $this->viewData["showConfirm"] = $this->mode !== "DSP";
+
+        //protegiendo de cross site scripting 
+        $this->xss_token = md5("categoriaForm" . date('Ymdhisu'));
+        $_SESSION["xss_token_categoria_form"] = $this->xss_token;
+        $this->viewData["xss_token"] = $this->xss_token;
     }
 
     private function render()
